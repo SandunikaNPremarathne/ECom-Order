@@ -1,6 +1,9 @@
 package com.sandunika.orderservice;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +18,7 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
+    @Cacheable(value = "orderCache", key = "#id")
     public Order getOrderById(long id)
     {
         return orderRepository.findById(id).orElse(null);
@@ -25,6 +29,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    @CachePut(value = "orderCache", key = "#order.id")
     public Order updateOrder(long id, Order order)
     {
         Order oldOrder = orderRepository.findById(id).orElse(null);
@@ -36,6 +41,7 @@ public class OrderService {
         return oldOrder;
     }
 
+    @CacheEvict(value = "orderCache", key = "#id")
     public void deleteOrder(long id)
     {
         orderRepository.deleteById(id);
